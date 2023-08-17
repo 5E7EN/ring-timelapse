@@ -8,8 +8,8 @@
         "build-container": "npm run clean && docker build . -t 5e7en/ring-timelapse:dev",
         "build-container-latest": "npm run clean && docker build . -t 5e7en/ring-timelapse:latest",
         "sh": "docker -it 5e7en/ring-timelapse:dev sh",
-        "snapshot": "node --no-warning dist/snapshot",
-        "timelapse": "node --no-warning dist/timelapse"
+        "snapshot": "node --no-warnings dist/snapshot",
+        "timelapse": "node --no-warnings dist/timelapse"
     },
     "author": "Wictor Wilén",
     "maintainers": [
