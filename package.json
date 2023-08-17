@@ -1,14 +1,14 @@
 {
     "name": "ring-timelapse-docker",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "description": "Ring Timelapse creator as a Docker container",
     "scripts": {
         "build": "tsc",
         "start": "node ./src/snapshot.js",
         "clean": "rimraf dist",
-        "build-container": "npm run clean && docker build . -t wictorwilen/ring-timelapse:dev",
-        "build-container-latest": "npm run clean && docker build . -t wictorwilen/ring-timelapse:latest",
-        "sh": "docker -it wictorwilen/ring-timelapse:dev sh",
+        "build-container": "npm run clean && docker build . -t 5e7en/ring-timelapse:dev",
+        "build-container-latest": "npm run clean && docker build . -t 5e7en/ring-timelapse:latest",
+        "sh": "docker -it 5e7en/ring-timelapse:dev sh",
         "snapshot": "node dist/snapshot",
         "timelapse": "node dist/timelapse"
     },
@@ -18,16 +18,21 @@
             "name": "Wictor Wilén",
             "email": "wictor@wictorwilen.se",
             "url": "http://www.wictorwilen.se"
+        },
+        {
+            "name": "5E7EN",
+            "email": "33012273+5E7EN@users.noreply.github.com",
+            "url": "https://5e7en.me"
         }
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/wictorwilen/ring-timelapse.git"
+        "url": "https://github.com/5e7en/ring-timelapse.git"
     },
     "bugs": {
-        "url": "https://github.com/wictorwilen/ring-timelapse/issues"
+        "url": "https://github.com/5e7en/ring-timelapse/issues"
     },
-    "homepage": "https://github.com/wictorwilen/ring-timelapse",
+    "homepage": "https://github.com/5e7en/ring-timelapse",
     "license": "MIT",
     "devDependencies": {
         "@types/fluent-ffmpeg": "^2.1.17",
