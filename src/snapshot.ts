@@ -1,52 +1,77 @@
-// Copyright (c) Wictor Wilén. All rights reserved. 
+// Copyright (c) Wictor Wilén. All rights reserved.
 // Licensed under the MIT license.
 
-import { writeFile, mkdirSync, existsSync } from 'fs';
-import { RingApi } from 'ring-client-api'
-import * as path from 'path'
-import * as dotenv from "dotenv";
-import * as lodash from "lodash";
+import path from 'path';
+import dotenv from 'dotenv';
+import camelCase from 'lodash.camelcase';
+import { RingApi } from 'ring-client-api';
+import { promises as fs } from 'fs';
 
-const log = console.log;
+// Load environment variables from .env file
+dotenv.config();
 
-async function snapshot() {
-    log("running snapshot")
+function log(message: string) {
+    console.log(`${new Date().toISOString()}: ${message}`);
+}
+
+async function pathExists(filePath: string): Promise<boolean> {
+    try {
+        await fs.access(filePath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function saveSnapshots() {
+    log('Executing snapshot task -');
+
+    // Create Ring API instance
     const ringApi = new RingApi({
         refreshToken: process.env.TOKEN as string,
         debug: true // false
     });
 
+    // Get all cameras
     const cameras = await ringApi.getCameras();
 
-    if (!existsSync(path.resolve(__dirname, "target"))) {
-        log("creating target");
-        mkdirSync(path.resolve(__dirname, "target"));
+    // Create target folder if it doesn't exist
+    if (!(await pathExists(path.resolve(__dirname, 'target')))) {
+        await fs.mkdir(path.resolve(__dirname, 'target'));
+        log('Target folder did not exist and was created.');
     }
 
-    cameras.forEach(camera => {
-        const name = lodash.camelCase(camera.name);
-        log(`Retrieving snapshot for ${camera.name}`);
+    // Loop through all cameras and take a snapshot
+    for (const camera of cameras) {
+        const cameraName = camera.name;
+        const cameraNameCased = camelCase(cameraName);
 
-        camera.getSnapshot().then(function (result) {
+        log(`[${cameraName}] Retrieving snapshot...`);
+
+        try {
+            // Take snapshot
+            const snapshot = await camera.getSnapshot();
+
+            // Save snapshot
             try {
-                log((path.resolve(__dirname, "target", name)));
-                if (!existsSync(path.resolve(__dirname, "target", name))) {
-                    mkdirSync(path.resolve(__dirname, "target", name));
+                // Create camera snapshots folder if it doesn't exist
+                if (!(await pathExists(path.resolve(__dirname, 'target', cameraNameCased)))) {
+                    log(`[${cameraName}] Snapshot folder did not exist and was created.`);
+                    await fs.mkdir(path.resolve(__dirname, 'target', cameraNameCased));
                 }
-                writeFile(path.resolve(__dirname, "target", path.join(name, Date.now() + '.png')), result, (err) => {
-                    if (err) throw err;
-                    log('Saved!');
-                });
-            } catch (err) {
-                log(`Error: ${err}`);
-            }
 
-        }).catch(err => {
-            log(`Snapshot error: ${err}`);
-        })
-    });
+                // Save snapshot to camera folder
+                await fs.writeFile(path.resolve(__dirname, 'target', path.join(cameraNameCased, Date.now() + '.png')), snapshot);
+                log(`[${cameraName}] Snapshot saved!`);
+            } catch (error) {
+                log(`[${cameraName}] Error encountered while saving snapshot: ${error}`);
+            }
+        } catch (error) {
+            log(`[${cameraName}] Error encountered while taking snapshot: ${error}`);
+        }
+    }
+
+    log('---');
 }
 
-dotenv.config();
-
-snapshot()
+saveSnapshots();
