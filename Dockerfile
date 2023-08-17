@@ -1,4 +1,4 @@
-FROM node:14.16 AS BUILD_IMAGE
+FROM node:16.13.2 AS BUILD_IMAGE
 
 # Install node-prune
 RUN curl -sf https://gobinaries.com/tj/node-prune | sh
@@ -19,7 +19,7 @@ RUN npm prune --production
 # Run node prune
 RUN /usr/local/bin/node-prune
 
-FROM node:14.16-alpine
+FROM node:16.13.2-alpine
 
 # Install ffmpeg
 RUN apk add  --no-cache ffmpeg
