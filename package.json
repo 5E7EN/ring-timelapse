@@ -1,6 +1,6 @@
 {
     "name": "ring-timelapse-docker",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "Ring snapshot taker and timelapse creator",
     "scripts": {
         "start": "node --no-warnings dist/app.js",
