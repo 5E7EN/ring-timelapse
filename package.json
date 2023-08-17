@@ -1,16 +1,15 @@
 {
     "name": "ring-timelapse-docker",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "description": "Ring Timelapse creator as a Docker container",
     "scripts": {
         "build": "tsc",
-        "start": "node ./src/snapshot.js",
         "clean": "rimraf dist",
         "build-container": "npm run clean && docker build . -t 5e7en/ring-timelapse:dev",
         "build-container-latest": "npm run clean && docker build . -t 5e7en/ring-timelapse:latest",
         "sh": "docker -it 5e7en/ring-timelapse:dev sh",
-        "snapshot": "node dist/snapshot",
-        "timelapse": "node dist/timelapse"
+        "snapshot": "node --no-warning dist/snapshot",
+        "timelapse": "node --no-warning dist/timelapse"
     },
     "author": "Wictor Wilén",
     "maintainers": [
