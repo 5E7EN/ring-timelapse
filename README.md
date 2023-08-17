@@ -35,20 +35,37 @@ cd /media
 mkdir timelapse
 ```
 
-Next, copy the `.env.example` file to `.env` and populate the values with your refresh token and desired options.
+Next, in the env folder, copy the `.env.example` file to `.env` and populate the values with your refresh token and desired options.
 
-Start the container by running:
+## Run
+
+Start the container by running the following:
+
+### Linux:
 
 ```bash
 docker run --name my-ring-timelapse \
   -d \
-  --env-file .env \
+  --env-file env/.env \
   -v "/media/timelapse:/app/target" \
+  -v $(pwd)/env:/app/env \
   --restart unless-stopped \
   5e7en/ring-timelapse
 ```
 
-> **NOTE**: In the `-v` argument replace the local path (`/media/timelapse`) with the directory you created
+### Windows:
+
+```powershell
+docker run --name my-ring-timelapse \
+  -d \
+  --env-file env/.env \
+  -v "/media/timelapse:/app/target" \
+  -v ${PWD}/env:/app/env \
+  --restart unless-stopped \
+  5e7en/ring-timelapse
+```
+
+> **NOTE**: In the first `-v` argument replace the local path (`/media/timelapse`) with the directory you created
 
 ## Environment Variables
 

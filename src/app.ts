@@ -8,13 +8,6 @@ import { RingApi } from 'ring-client-api';
 import { promises as fs, readFile, writeFile } from 'fs';
 import { promisify } from 'util';
 
-dotenv.config();
-
-const targetDir = '../target';
-
-// Parse snapshot interval
-const snapshotInterval = process.env.SNAPSHOT_INTERVAL_SECONDS ? parseInt(process.env.SNAPSHOT_INTERVAL_SECONDS) : 15;
-
 function log(message: string) {
     console.log(`${new Date().toISOString()}: ${message}`);
 }
@@ -28,28 +21,8 @@ async function pathExists(filePath: string): Promise<boolean> {
     }
 }
 
-async function saveSnapshots() {
+async function saveSnapshots(ringApi: RingApi) {
     log('Executing snapshot task -');
-
-    // Create Ring API instance
-    const ringApi = new RingApi({
-        refreshToken: process.env.TOKEN as string,
-        debug: true // false
-    });
-
-    // Listen for refresh token updates
-    ringApi.onRefreshTokenUpdated.subscribe(async ({ newRefreshToken, oldRefreshToken }) => {
-        // If you are implementing a project that use `ring-client-api`, you should subscribe to onRefreshTokenUpdated and update your config each time it fires an event
-        // Here is an example using a .env file for configuration
-        if (!oldRefreshToken) {
-            return;
-        }
-
-        const currentConfig = await promisify(readFile)('.env'),
-            updatedConfig = currentConfig.toString().replace(oldRefreshToken, newRefreshToken);
-
-        await promisify(writeFile)('.env', updatedConfig);
-    });
 
     // Get all cameras
     const cameras = await ringApi.getCameras();
@@ -93,6 +66,43 @@ async function saveSnapshots() {
     log('---');
 }
 
+/* Main */
+
+// Load .env file
+const envPath = path.resolve(__dirname, '../env/.env');
+dotenv.config({ path: envPath });
+
+const targetDir = '../target';
+// Parse snapshot interval
+const snapshotInterval = process.env.SNAPSHOT_INTERVAL_SECONDS ? parseInt(process.env.SNAPSHOT_INTERVAL_SECONDS) : 15;
+
+// Create Ring API instance
+const ringApi = new RingApi({
+    refreshToken: process.env.TOKEN as string,
+    debug: true // false
+});
+
+// Listen for refresh token updates
+ringApi.onRefreshTokenUpdated.subscribe(async ({ newRefreshToken, oldRefreshToken }) => {
+    if (!oldRefreshToken) {
+        return;
+    }
+
+    if (newRefreshToken == oldRefreshToken) {
+        return;
+    }
+
+    log('!! Refresh token updated, updating .env file...');
+
+    const currentConfig = await promisify(readFile)(envPath);
+    const updatedConfig = currentConfig.toString().replace(oldRefreshToken, newRefreshToken);
+
+    await promisify(writeFile)(envPath, updatedConfig);
+
+    log('!! Refresh token updated in .env file!');
+});
+
+// Launch snapshot task
 log(`Starting snapshot task, taking snapshots every ${snapshotInterval} seconds... GLHF!`);
-setInterval(saveSnapshots, 1000 * snapshotInterval);
-saveSnapshots();
+setInterval(() => saveSnapshots(ringApi), 1000 * snapshotInterval);
+saveSnapshots(ringApi);
