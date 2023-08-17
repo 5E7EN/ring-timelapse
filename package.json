@@ -1,47 +1,48 @@
 {
-  "name": "ring-timelapse-docker",
-  "version": "1.0.1",
-  "description": "Ring Timelapse creator as a Docker container",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rimraf dist",
-    "build-container": "npm run clean && docker build . -t wictorwilen/ring-timelapse:dev",
-    "build-container-latest": "npm run clean && docker build . -t wictorwilen/ring-timelapse:latest",
-    "sh": "docker -it wictorwilen/ring-timelapse:dev sh",
-    "snapshot": "node dist/snapshot",
-    "timelapse": "node dist/timelapse"
-  },
-  "author": "Wictor Wilén",
-  "maintainers": [
-    {
-      "name": "Wictor Wilén",
-      "email": "wictor@wictorwilen.se",
-      "url": "http://www.wictorwilen.se"
+    "name": "ring-timelapse-docker",
+    "version": "1.0.1",
+    "description": "Ring Timelapse creator as a Docker container",
+    "scripts": {
+        "build": "tsc",
+        "start": "node ./src/snapshot.js",
+        "clean": "rimraf dist",
+        "build-container": "npm run clean && docker build . -t wictorwilen/ring-timelapse:dev",
+        "build-container-latest": "npm run clean && docker build . -t wictorwilen/ring-timelapse:latest",
+        "sh": "docker -it wictorwilen/ring-timelapse:dev sh",
+        "snapshot": "node dist/snapshot",
+        "timelapse": "node dist/timelapse"
+    },
+    "author": "Wictor Wilén",
+    "maintainers": [
+        {
+            "name": "Wictor Wilén",
+            "email": "wictor@wictorwilen.se",
+            "url": "http://www.wictorwilen.se"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wictorwilen/ring-timelapse.git"
+    },
+    "bugs": {
+        "url": "https://github.com/wictorwilen/ring-timelapse/issues"
+    },
+    "homepage": "https://github.com/wictorwilen/ring-timelapse",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/fluent-ffmpeg": "^2.1.17",
+        "@types/lodash": "^4.14.168",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.2.4"
+    },
+    "dependencies": {
+        "dotenv": "^8.2.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "lodash": "^4.17.21",
+        "ring-client-api": "^11.8.1"
+    },
+    "funding": {
+        "type": "individual",
+        "url": "https://github.com/sponsors/wictorwilen/"
     }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wictorwilen/ring-timelapse.git"
-  },
-  "bugs": {
-    "url": "https://github.com/wictorwilen/ring-timelapse/issues"
-  },
-  "homepage": "https://github.com/wictorwilen/ring-timelapse",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/fluent-ffmpeg": "^2.1.17",
-    "@types/lodash": "^4.14.168",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.2.4"
-  },
-  "dependencies": {
-    "dotenv": "^8.2.0",
-    "fluent-ffmpeg": "^2.1.2",
-    "lodash": "^4.17.21",
-    "ring-client-api": "^9.21.0"
-  },
-  "funding": {
-    "type": "individual",
-    "url": "https://github.com/sponsors/wictorwilen/"
-  }
 }
