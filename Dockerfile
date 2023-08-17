@@ -1,27 +1,27 @@
 FROM node:14.16 AS BUILD_IMAGE
 
-# install node-prune
-RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
+# Install node-prune
+RUN curl -sf https://gobinaries.com/tj/node-prune | sh
 
 WORKDIR /work
 
 COPY . /work/
 
-# install 
+# Install dependencies 
 RUN npm install 
 
-# build
+# Build the app
 RUN npm run build
 
-# remove development dependencies
+# Remove development dependencies
 RUN npm prune --production
 
-# run node prune
+# Run node prune
 RUN /usr/local/bin/node-prune
 
 FROM node:14.16-alpine
 
-# add ffmpeg
+# Install ffmpeg
 RUN apk add  --no-cache ffmpeg
 
 ENV TOKEN=$TOKEN 
