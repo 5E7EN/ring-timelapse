@@ -59,7 +59,7 @@ The following variables are optional:
 
 `CRON_SCHEDULE` - Schedule for taking snapshots, in [Crontab format](https://linuxhandbook.com/crontab/). Default: `*/15 * * * *`
 
-`CRON_SCHEDULE_TIMELAPSE` - Schedule for generating the timelapse video. Default: `0 7 * * *`
+`CRON_SCHEDULE_TIMELAPSE` - Schedule for generating the timelapse video. Default: `0 0 * * 6`
 
 ## Authors
 

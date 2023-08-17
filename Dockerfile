@@ -27,7 +27,7 @@ RUN apk add  --no-cache ffmpeg
 ENV TOKEN=$TOKEN 
 # ENV CRON_SCHEDULE="*/1 * * * *"
 ENV CRON_SCHEDULE="*/15 * * * *"
-ENV CRON_SCHEDULE_TIMELAPSE="0 7 * * *"
+ENV CRON_SCHEDULE_TIMELAPSE="0 0 * * 6"
 
 WORKDIR /app
 
