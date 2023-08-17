@@ -7,8 +7,7 @@ A Docker container that periodically takes snapshots from your [Ring](https://ww
 
 ## Features
 
--   Takes snapshots of all Ring cameras periodically, default 15 minutes
--   Creates a timelapse video periodically, default every day
+-   Takes snapshots of all Ring cameras periodically, default 15 seconds
 -   Runs as a Docker container with minimal footprint
 
 > **NOTE**: Taking snapshots often will drain the battery faster than normal.
@@ -22,7 +21,7 @@ To generate the token use the following command:
 npx -p ring-client-api ring-auth-cli
 ```
 
-Use the following to pull the Docker container from Docker hub.
+Use the following to pull the latest Docker image from Docker hub.
 
 ```bash
 docker pull 5e7en/ring-timelapse
@@ -36,14 +35,16 @@ cd /media
 mkdir timelapse
 ```
 
+Next, copy the `.env.example` file to `.env` and populate the values with your refresh token and desired options.
+
 Start the container by running:
 
 ```bash
-docker run
-  -d
-  -e TOKEN="<insert token here>"
-  -v "/media/timelapse:/app/dist/target"
-  --restart unless-stopped
+docker run --name my-ring-timelapse \
+  -d \
+  --env-file .env \
+  -v "/media/timelapse:/app/target" \
+  --restart unless-stopped \
   5e7en/ring-timelapse
 ```
 
@@ -57,9 +58,7 @@ The following variables are required:
 
 The following variables are optional:
 
-`CRON_SCHEDULE` - Schedule for taking snapshots, in [Crontab format](https://linuxhandbook.com/crontab/). Default: `*/15 * * * *`
-
-`CRON_SCHEDULE_TIMELAPSE` - Schedule for generating the timelapse video. Default: `0 0 * * 6`
+`SNAPSHOT_INTERVAL_SECONDS` - Interval for taking snapshots in seconds. Default: 15
 
 ## Authors
 

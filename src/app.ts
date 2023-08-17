@@ -2,13 +2,18 @@
 // Licensed under the MIT license.
 
 import path from 'path';
-import dotenv from 'dotenv';
 import camelCase from 'lodash.camelcase';
+import dotenv from 'dotenv';
 import { RingApi } from 'ring-client-api';
-import { promises as fs } from 'fs';
+import { promises as fs, readFile, writeFile } from 'fs';
+import { promisify } from 'util';
 
-// Load environment variables from .env file
 dotenv.config();
+
+const targetDir = '../target';
+
+// Parse snapshot interval
+const snapshotInterval = process.env.SNAPSHOT_INTERVAL_SECONDS ? parseInt(process.env.SNAPSHOT_INTERVAL_SECONDS) : 15;
 
 function log(message: string) {
     console.log(`${new Date().toISOString()}: ${message}`);
@@ -32,12 +37,26 @@ async function saveSnapshots() {
         debug: true // false
     });
 
+    // Listen for refresh token updates
+    ringApi.onRefreshTokenUpdated.subscribe(async ({ newRefreshToken, oldRefreshToken }) => {
+        // If you are implementing a project that use `ring-client-api`, you should subscribe to onRefreshTokenUpdated and update your config each time it fires an event
+        // Here is an example using a .env file for configuration
+        if (!oldRefreshToken) {
+            return;
+        }
+
+        const currentConfig = await promisify(readFile)('.env'),
+            updatedConfig = currentConfig.toString().replace(oldRefreshToken, newRefreshToken);
+
+        await promisify(writeFile)('.env', updatedConfig);
+    });
+
     // Get all cameras
     const cameras = await ringApi.getCameras();
 
     // Create target folder if it doesn't exist
-    if (!(await pathExists(path.resolve(__dirname, 'target')))) {
-        await fs.mkdir(path.resolve(__dirname, 'target'));
+    if (!(await pathExists(path.resolve(__dirname, targetDir)))) {
+        await fs.mkdir(path.resolve(__dirname, targetDir));
         log('Target folder did not exist and was created.');
     }
 
@@ -55,13 +74,13 @@ async function saveSnapshots() {
             // Save snapshot
             try {
                 // Create camera snapshots folder if it doesn't exist
-                if (!(await pathExists(path.resolve(__dirname, 'target', cameraNameCased)))) {
+                if (!(await pathExists(path.resolve(__dirname, targetDir, cameraNameCased)))) {
                     log(`[${cameraName}] Snapshot folder did not exist and was created.`);
-                    await fs.mkdir(path.resolve(__dirname, 'target', cameraNameCased));
+                    await fs.mkdir(path.resolve(__dirname, targetDir, cameraNameCased));
                 }
 
                 // Save snapshot to camera folder
-                await fs.writeFile(path.resolve(__dirname, 'target', path.join(cameraNameCased, Date.now() + '.png')), snapshot);
+                await fs.writeFile(path.resolve(__dirname, targetDir, path.join(cameraNameCased, Date.now() + '.png')), snapshot);
                 log(`[${cameraName}] Snapshot saved!`);
             } catch (error) {
                 log(`[${cameraName}] Error encountered while saving snapshot: ${error}`);
@@ -74,4 +93,6 @@ async function saveSnapshots() {
     log('---');
 }
 
+log(`Starting snapshot task, taking snapshots every ${snapshotInterval} seconds... GLHF!`);
+setInterval(saveSnapshots, 1000 * snapshotInterval);
 saveSnapshots();

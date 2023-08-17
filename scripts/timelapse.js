@@ -1,21 +1,23 @@
 // Copyright (c) Wictor Wilén. All rights reserved.
 // Licensed under the MIT license.
 
-import { writeFileSync, rmSync, existsSync, readdirSync, lstatSync } from 'fs';
-import * as path from 'path';
-import FfmpegCommand from 'fluent-ffmpeg';
+const { writeFileSync, rmSync, existsSync, readdirSync, lstatSync } = require('fs');
+const path = require('path');
+const FfmpegCommand = require('fluent-ffmpeg');
+
+const targetDir = '../target';
 
 async function timelapse() {
-    const folders = readdirSync(path.resolve(__dirname, 'target'));
+    const folders = readdirSync(path.resolve(__dirname, targetDir));
     folders.forEach((f) => {
-        if (lstatSync(path.resolve(__dirname, 'target', f)).isDirectory()) {
+        if (lstatSync(path.resolve(__dirname, targetDir, f)).isDirectory()) {
             console.log(f);
 
             let command = FfmpegCommand();
 
-            const files = readdirSync(path.resolve(__dirname, 'target', f));
+            const files = readdirSync(path.resolve(__dirname, targetDir, f));
             let template = '';
-            const templateFilePath = path.resolve(__dirname, 'target', f + '-' + Date.now() + '.txt');
+            const templateFilePath = path.resolve(__dirname, targetDir, f + '-' + Date.now() + '.txt');
 
             command.on('error', (err) => {
                 console.log('An error occurred: ' + err.message);
@@ -34,14 +36,14 @@ async function timelapse() {
 
             // add all the image files
             for (const file of files.sort((a, b) => {
-                return lstatSync(path.resolve(__dirname, 'target', f, a)).mtimeMs - lstatSync(path.resolve(__dirname, 'target', f, b)).mtimeMs;
+                return lstatSync(path.resolve(__dirname, targetDir, f, a)).mtimeMs - lstatSync(path.resolve(__dirname, targetDir, f, b)).mtimeMs;
             })) {
                 console.log(`Adding ${file}`);
-                template += `file ${path.resolve(__dirname, 'target', f, file)}\n`;
+                template += `file ${path.resolve(__dirname, targetDir, f, file)}\n`;
             }
 
             // add the last file on additional time
-            template += `file ${path.resolve(__dirname, 'target', f, files[files.length - 1])}\n`;
+            template += `file ${path.resolve(__dirname, targetDir, f, files[files.length - 1])}\n`;
 
             // write the template file to disk
             writeFileSync(templateFilePath, template);
@@ -55,7 +57,7 @@ async function timelapse() {
             command.format('mp4');
 
             // persist the file
-            command.save(path.resolve(__dirname, 'target', f + '-' + Date.now() + '.mp4'));
+            command.save(path.resolve(__dirname, targetDir, f + '-' + Date.now() + '.mp4'));
         }
     });
 }

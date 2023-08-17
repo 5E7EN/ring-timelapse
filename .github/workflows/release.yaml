@@ -14,9 +14,6 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: '16.13.2'
-            - run: npm install
-            - run: npm run build
-            - run: npm run build-container-latest
             - name: Login to DockerHub
               uses: docker/login-action@v1
               with:
