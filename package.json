@@ -1,6 +1,6 @@
 {
     "name": "ring-timelapse-docker",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "description": "Ring Timelapse creator as a Docker container",
     "scripts": {
         "start": "node --no-warnings dist/app.js",
